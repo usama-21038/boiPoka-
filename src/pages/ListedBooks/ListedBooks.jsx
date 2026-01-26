@@ -1,12 +1,28 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLoaderData } from 'react-router';
+import { getList, READ_KEY, WISHLIST_KEY } from '../../utils/storage.js';
 
 const ListedBooks = () => {
-    const books = useLoaderData() || [];
+    const loaderBooks = useLoaderData();
+    const books = useMemo(() => loaderBooks ?? [], [loaderBooks]);
     const [activeTab, setActiveTab] = useState('read');
+    const [readBooks, setReadBooks] = useState([]);
+    const [wishlistBooks, setWishlistBooks] = useState([]);
 
-    const readBooks = useMemo(() => books, [books]);
-    const wishlistBooks = useMemo(() => books, [books]);
+    useEffect(() => {
+        const syncFromStorage = () => {
+            const bookMap = new Map((books || []).map(b => [b.bookId, b]));
+            const storedRead = getList(READ_KEY).map(item => bookMap.get(item.bookId) || item);
+            const storedWishlist = getList(WISHLIST_KEY).map(item => bookMap.get(item.bookId) || item);
+            setReadBooks(storedRead);
+            setWishlistBooks(storedWishlist);
+        };
+
+        syncFromStorage();
+        window.addEventListener('storage', syncFromStorage);
+        return () => window.removeEventListener('storage', syncFromStorage);
+    }, [books]);
+
     const currentList = activeTab === 'read' ? readBooks : wishlistBooks;
 
     return (
@@ -41,7 +57,7 @@ const ListedBooks = () => {
             <div className="space-y-4">
                 {currentList.map(book => (
                     <div key={book.bookId} className="flex flex-col md:flex-row gap-4 p-4 border rounded-2xl bg-base-100">
-                        <div className="w-full md:w-40 flex-shrink-0 flex justify-center items-start">
+                        <div className="w-full md:w-40 shrink-0 flex justify-center items-start">
                             <div className="bg-base-200 rounded-xl p-4">
                                 <img src={book.image} alt={book.bookName} className="h-32 object-contain" />
                             </div>

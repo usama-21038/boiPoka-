@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLoaderData } from 'react-router';
+import { isInList, toggleBookInList, READ_KEY, WISHLIST_KEY } from '../../utils/storage.js';
 
 const BookDetails = () => {
     const book = useLoaderData();
+    const [inRead, setInRead] = useState(false);
+    const [inWishlist, setInWishlist] = useState(false);
+
+    useEffect(() => {
+        setInRead(isInList(READ_KEY, book.bookId));
+        setInWishlist(isInList(WISHLIST_KEY, book.bookId));
+    }, [book]);
+
+    const handleRead = () => {
+        const { added } = toggleBookInList(READ_KEY, book);
+        setInRead(added);
+    };
+
+    const handleWishlist = () => {
+        const { added } = toggleBookInList(WISHLIST_KEY, book);
+        setInWishlist(added);
+    };
 
     return (
         <div className="py-12">
@@ -58,8 +76,12 @@ const BookDetails = () => {
                         </div>
 
                         <div className="flex gap-4">
-                            <button className="btn bg-white border-gray-300 hover:bg-gray-50 px-8">Read</button>
-                            <button className="btn bg-cyan-400 hover:bg-cyan-500 text-white border-0 px-8">Wishlist</button>
+                            <button onClick={handleRead} className="btn bg-white border-gray-300 hover:bg-gray-50 px-8">
+                                {inRead ? 'Remove from Read' : 'Read'}
+                            </button>
+                            <button onClick={handleWishlist} className="btn bg-cyan-400 hover:bg-cyan-500 text-white border-0 px-8">
+                                {inWishlist ? 'Remove from Wishlist' : 'Wishlist'}
+                            </button>
                         </div>
                     </div>
                 </div>
