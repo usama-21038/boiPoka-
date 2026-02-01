@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLoaderData } from 'react-router';
 import { getList, READ_KEY, WISHLIST_KEY } from '../../utils/storage.js';
+import { Helmet } from 'react-helmet-async';
 
 const ListedBooks = () => {
     const loaderBooks = useLoaderData();
@@ -27,6 +28,9 @@ const ListedBooks = () => {
 
     return (
         <div className="space-y-6 pb-10">
+            <Helmet>
+                <title>ListedBook | Books</title>
+            </Helmet>
             <div className="bg-base-200 rounded-2xl py-8 px-4 text-center">
                 <h1 className="text-2xl font-semibold">Books</h1>
             </div>
